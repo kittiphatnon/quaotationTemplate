@@ -10,7 +10,7 @@ process.on('uncaughtException', function (err) {
   console.log(err);
 });
 
-
+//This is mock up items
 const items = {
   documentItems: [
     {id:'1' , productId:'DF001', quantity:1, unitName:'ชิ้น', productName:'บราวนี่', productDescription:'บราวนี่รสชาติดี', unitPrice:100 , priceBeforeTax:100},
