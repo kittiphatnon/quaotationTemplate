@@ -59,10 +59,10 @@ const items = {
   grandTotal:'1869.54',
   subTotal:'1869.54',
   total:'1869.54',
-  paymentDescription:'คอมพ์มหภาคตอกย้ำแพทยสภา โหงวเฮ้ง โซลาร์แซวพุทธภูมิกลาส มายองเนส ซัพพลายปัจเจกชนผลักดันพันธกิจ อีสเตอร์ เมจิกล็อตช็อปเปอร์พันธุวิศวกรรม เอ็กซ์เพรส วาฟเฟิลเซอร์วิสดีพาร์ตเมนต์ ไฮไลต์เซ็กซี่ ล็อตตอกย้ำ เฮอร์ริเคนธรรม',
-  remark:'คอมพ์มหภาคตอกย้ำแพทยสภา โหงวเฮ้ง โซลาร์แซวพุทธภูมิกลาส มายองเนส ซัพพลายปัจเจกชนผลักดันพันธกิจ อีสเตอร์ เมจิกล็อตช็อปเปอร์พันธุวิศวกรรม เอ็กซ์เพรส วาฟเฟิลเซอร์วิสดีพาร์ตเมนต์ ไฮไลต์เซ็กซี่ ล็อตตอกย้ำ เฮอร์ริเคนธรรม',
+  remark:'คอรัปชั่นช็อคซิมโฟนี่ศิลปวัฒนธรรมตุ๊กตุ๊ก มิลค์ แคนู รีดไถมาร์ชเฟรชก่อนหน้า ซีเนียร์อุเทนรองรับ แซ็กโซโฟนซูมสต็อคจ๊อกกี้ โปรเจคท์ภคันทลาพาธธรรมาภิบาล โรแมนติกเฝอก่อนหน้าแม่ค้า ป๊อกเทเลกราฟโพลล์ วิน รามเทพ เซาท์ตนเองเกจิเทอร์โบไอติม ผิดพลาดชัวร์ โรแมนติคโปรเจกเตอร์เกรดไลท์ ไวอากร้าออดิทอเรียมเสกสรรค์แอปเปิ้ลไวกิ้ง ชินบัญชรคอนโทรลเวณิกาสเก็ตช์ มาร์เก็ตแคนยอนนิรันดร์ เวิลด์พล็อตมั้งอาว์เคลื่อนย้าย ทรูแฟ้บ ชินบัญชร วอล์คไฟต์อิเลียด สตาร์หมายปองเยอร์บีราแมมโบ้ มาร์คฮองเฮา เกย์ออกแบบ ดยุคเซ็กซ์ คอร์ป เรซิ่นแอดมิสชันเยอบีรา ยูโรหลินจือกรุ๊ปสมาพันธ์ล็อบบี้ มายาคติสตาร์โอวัลตินออโต้เซฟตี้ ตู้เซฟถูกต้องโรลออนไลฟ์ มือถือก่อนหน้าสเก็ตช์แบ็กโฮแฮนด์',
   approvalPerson:'กิตติภัทธ์ โลวตระกูล',     //ไม่แน่ใจ
-  
+  paymentCondition:'จ่ายภายใน 30 วัน โดยโอนไปที่บัญชีธนาคารกรุงไทย 12345678975',
+  dueDate:'2023-07-19T00:00:00.000Z' //หาตัวแปรไม่เจอของช่อง ครบกำหนด / Valid
 };
 
 async function generatePDF(callback) {
@@ -110,9 +110,9 @@ async function generatePDF(callback) {
     //หัวข้อ
     doc.setFont('THSarabunNew','bold');
     doc.setFontSize(26);
-    doc.text("ใบเสนอราคา",200, 25,'right');
+    doc.text("ใบแจ้งหนี้",200, 25,'right');
     doc.setFontSize(16);
-    doc.text("Quotation",200, 30,'right');
+    doc.text("Invoice",200, 30,'right');
     
     //คนขาย
     doc.setFontSize(12);
@@ -141,10 +141,12 @@ async function generatePDF(callback) {
     doc.text('เลขผู้เสียภาษี / Tax ID :', 10, 80);
     doc.text('เลขที่ / No. :', 10, 85);
     doc.text('อ้างอิง / Ref. :', 10, 90);
+    doc.text('ครบกำหนด / Valid :', 10, 95)
     doc.text('สาขา / Branch :', 105, 70);
     doc.text('วันที่ / Issue :', 105, 80);
     doc.text('ผู้ติดต่อ / Attention :', 105, 85);
     doc.text('เบอร์โทรศัพท์ / Tel. :', 105, 90);
+    doc.text('เงื่อนไขการชำระเงิน / Payment condition :', 105, 95)
     
     //ลูกค้า(นำข้อมูลมาแสดง)
     doc.setFont('THSarabunNew','normal');
@@ -153,48 +155,50 @@ async function generatePDF(callback) {
     doc.text(items.contactTaxId, 39.5, 80);
     doc.text(items.code, 26.5, 85);
     doc.text(items.referenceNo, 28.5, 90);
+    doc.text(items.dueDate.slice(0,10), 35.5, 95);
     doc.text(items.contactBranch, 126.5, 70);
     doc.text(items.issueDate.slice(0,10), 123, 80);
     doc.text(items.contactPerson, 132, 85);
     doc.text(items.contactPhone, 131.5, 90);
+    doc.text(items.paymentCondition,159.5 ,95)
   }
   
   async function createTable(items) {
     //ตารางรายการสินค้า
-    doc.rect(10, 95, 190, 89);
+    doc.rect(10, 100, 190, 89);
     //หัวตาราง
     doc.setFont('THSarabunNew','bold');
-    doc.rect(10, 95, 190, 15);
-    doc.text('เลขที่', 14, 100);
-    doc.text('No.', 14.7, 105);
-    doc.text('รหัสสินค้า', 30, 100);
-    doc.text('Product No.', 28.5, 105);
-    doc.text('สินค้า/คำอธิบาย', 65, 100);
-    doc.text('Product/Description', 61, 105);
-    doc.text('จำนวน', 102, 100);
-    doc.text('Quantity', 100.5, 105);
-    doc.text('หน่วย', 119, 100);
-    doc.text('Unit', 119.5, 105);
-    doc.text('ราคาต่อหน่วย(บาท)', 135, 100);
-    doc.text('Unit Price(Baht)', 136.2, 105);
-    doc.text('มูลค่าก่อนภาษี', 172.5, 100);
-    doc.text('Pre-tax amount', 170.5, 105);
+    doc.rect(10, 100, 190, 15);
+    doc.text('เลขที่', 14, 105);
+    doc.text('No.', 14.7, 110);
+    doc.text('รหัสสินค้า', 30, 105);
+    doc.text('Product No.', 28.5, 110);
+    doc.text('สินค้า/คำอธิบาย', 65, 105);
+    doc.text('Product/Description', 61, 110);
+    doc.text('จำนวน', 102, 105);
+    doc.text('Quantity', 100.5, 110);
+    doc.text('หน่วย', 119, 105);
+    doc.text('Unit', 119.5, 110);
+    doc.text('ราคาต่อหน่วย(บาท)', 135, 105);
+    doc.text('Unit Price(Baht)', 136.2, 110);
+    doc.text('มูลค่าก่อนภาษี', 172.5, 105);
+    doc.text('Pre-tax amount', 170.5, 110);
     
     //ข้อมูลในตาราง
     doc.setFont('THSarabunNew','normal');
     doc.setTextColor(0,0,0);
     
     for (let i=0; i<items.length; i++) {
-      doc.text(items[i].id, getStartPoint(items[i].id,14)+10, 117.5 + (i*12));
-      doc.text(items[i].productId, getStartPoint(items[i].productId,24)+24, 117.5 + (i*12));
-      doc.text(items[i].productName, getStartPoint(items[i].productName,50)+48, 115 + (i*12));
+      doc.text(items[i].id, getStartPoint(items[i].id,14)+10, 122.5 + (i*12));
+      doc.text(items[i].productId, getStartPoint(items[i].productId,24)+24, 122.5 + (i*12));
+      doc.text(items[i].productName, getStartPoint(items[i].productName,50)+48, 120 + (i*12));
       doc.setFontSize(10);
-      doc.text(items[i].productDescription, getStartPoint(items[i].productDescription,50)+48, 120 + (i*12));
+      doc.text(items[i].productDescription, getStartPoint(items[i].productDescription,50)+48, 125 + (i*12));
       doc.setFontSize(12);
-      doc.text(items[i].quantity.toString(), getStartPoint(items[i].quantity.toString(),16.5)+98, 117.5 + (i*12));
-      doc.text(items[i].unitName, getStartPoint(items[i].unitName,15.5)+114.5, 117.5 + (i*12));
-      doc.text(items[i].unitPrice.toString(), getStartPoint(items[i].unitPrice.toString(),33)+130, 117.5 + (i*12));
-      doc.text(items[i].priceBeforeTax.toString(), getStartPoint(items[i].priceBeforeTax.toString(),37)+163, 117.5 + (i*12));
+      doc.text(items[i].quantity.toString(), getStartPoint(items[i].quantity.toString(),16.5)+98, 122.5 + (i*12));
+      doc.text(items[i].unitName, getStartPoint(items[i].unitName,15.5)+114.5, 122.5 + (i*12));
+      doc.text(items[i].unitPrice.toString(), getStartPoint(items[i].unitPrice.toString(),33)+130, 122.5 + (i*12));
+      doc.text(items[i].priceBeforeTax.toString(), getStartPoint(items[i].priceBeforeTax.toString(),37)+163, 122.5 + (i*12));
     }
     
   }
@@ -202,17 +206,17 @@ async function generatePDF(callback) {
   async function createFooter(items) {
     //สรุปเงิน
     doc.setFont('THSarabunNew', 'bold');
-    doc.text('ส่วนลด / Discount', 105, 190);
-    doc.text('ราคาสุทธิสินค้าที่เสียภาษี / Sub Total', 105, 195);
-    doc.text('ภาษีมูลค่าเพิ่ม / Vat', 105, 200);
-    doc.text('ราคารวมก่อนหัก ณ ที่จ่าย / Total', 105, 205);
-    doc.text('จำนวนเงินรวมทั้งสิ้น / Grand Total', 105, 210);
+    doc.text('ส่วนลด / Discount', 105, 195);
+    doc.text('ราคาสุทธิสินค้าที่เสียภาษี / Sub Total', 105, 200);
+    doc.text('ภาษีมูลค่าเพิ่ม / Vat', 105, 205);
+    doc.text('ราคารวมก่อนหัก ณ ที่จ่าย / Total', 105, 210);
+    doc.text('จำนวนเงินรวมทั้งสิ้น / Grand Total', 105, 215);
     
-    doc.text(items.discountAmount, 200, 190,'right');
-    doc.text(items.subTotal, 200, 195,'right');
-    doc.text(items.vatAmount, 200, 200,'right');
-    doc.text(items.total, 200, 205,'right');
-    doc.text(items.grandTotal, 200, 210,'right');
+    doc.text(items.discountAmount, 200, 195,'right');
+    doc.text(items.subTotal, 200, 200,'right');
+    doc.text(items.vatAmount, 200, 205,'right');
+    doc.text(items.total, 200, 210,'right');
+    doc.text(items.grandTotal, 200, 215,'right');
     
     const moneyInText = items.moneyText.thai;
     const moneyEngText = items.moneyText.eng;
@@ -248,10 +252,10 @@ async function generatePDF(callback) {
       });
       
       
-      doc.text(line1, 200, 215, 'right');
-      doc.text(line2, 200, 220, 'right');
-      doc.text(eng1, 200, 225, 'right');
-      doc.text(eng2, 200, 230, 'right');
+      doc.text(line1, 200, 220, 'right');
+      doc.text(line2, 200, 225, 'right');
+      doc.text(eng1, 200, 230, 'right');
+      doc.text(eng2, 200, 235, 'right');
     }
     displayAllMoneyText(allMoneyText, moneyEngText);
     
@@ -260,49 +264,20 @@ async function generatePDF(callback) {
     doc.setFont('THSarabunNew', 'bold');
     doc.setFillColor(241, 241, 241);
     doc.setDrawColor(241,241,241);
-    doc.rect(10, 190, 50, 8, 'FD');  
-    doc.text('วิธีการชำระเงิน / Payment Detail', 12, 195);
-    doc.setFillColor(241, 241, 241);
-    doc.setDrawColor(241,241,241);
-    doc.rect(10, 215, 50, 8,'FD');
-    doc.text('หมายเหตุ / Remark', 12, 220);
+    doc.rect(10, 192, 50, 8,'FD');
+    doc.text('หมายเหตุ / Remark', 12, 197);
     
     //ข้อความในวิธีการชำระเงิน
     doc.setFont('THSarabunNew', 'normal');
-    const paymentText = items.paymentDescription;
     const remarkText = items.remark;
-    function displayPaymentText(paymentText) {
-      const maxWidth = 90; // Maximum width in points
-      const maxLines = 3; // Maximum number of lines to display
-      let currentLine = 1;
-      let currentLineWidth = 0;
-      let line = '';
-      wordcut.init();
-      const wordList = wordcut.cut(paymentText);
-      const wordArray = wordList.split('|');
-      wordArray.forEach((word) => {
-        if (currentLine <= maxLines) {
-          if (currentLineWidth + doc.getTextWidth(word) < maxWidth) {
-            line += word;
-            currentLineWidth += doc.getTextWidth(word);
-          } else {
-            doc.text(line, 10, 202 + (5 * (currentLine - 1)));
-            currentLine++;
-            line = word;
-            currentLineWidth = doc.getTextWidth(word);
-          }
-        }
-      });
-      doc.text(line, 10, 202 + (5 * (currentLine - 1)));
-    }
     function displayRemarkText(remarkText) {
       const maxWidth = 90; // Maximum width in points
-      const maxLines = 3; // Maximum number of lines to display
+      const maxLines = 6; // Maximum number of lines to display
       let currentLine = 1;
       let currentLineWidth = 0;
       let line = '';
       wordcut.init();
-      const wordList = wordcut.cut(paymentText);
+      const wordList = wordcut.cut(remarkText);
       const wordArray = wordList.split('|');
       wordArray.forEach((word) => {
         if (currentLine <= maxLines) {
@@ -310,18 +285,17 @@ async function generatePDF(callback) {
             line += word;
             currentLineWidth += doc.getTextWidth(word);
           } else {
-            doc.text(line, 10, 227 + (5 * (currentLine - 1)));
+            doc.text(line, 10, 204 + (5 * (currentLine - 1)));
             currentLine++;
             line = word;
             currentLineWidth = doc.getTextWidth(word);
           }
         }
       });
-      doc.text(line, 10, 227 + (5 * (currentLine - 1)));
+      doc.text(line, 10, 204 + (5 * (currentLine - 1)));
     }
     
     // Example usage:
-    displayPaymentText(paymentText);
     displayRemarkText(remarkText);
     
     // สร้างกล่องลงชื่อ
@@ -377,7 +351,8 @@ async function generatePDF(callback) {
     //text กล่องที่สี่
     doc.setFont('THSarabunNew','bold');
     doc.setFontSize(12);
-    doc.text("ยอมรับใบเสนอราคา / Accepted by", 154.5, 252);
+    doc.setTextColor(0,0,0);
+    doc.text("ยอมรับใบแจ้งหนี้ / Accepted by", 156.5, 252);
     doc.setLineWidth(0.1);
     doc.line(160, 270, 192.5, 270); //ลายเซ็น
     await addImageToPDF('https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Autograph_of_Benjamin_Franklin.svg/1200px-Autograph_of_Benjamin_Franklin.svg.png', 161.35, 255, 30.8, 14.23);
